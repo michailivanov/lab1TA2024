@@ -2,47 +2,61 @@ package michail;
 
 import java.util.Objects;
 import java.util.Random;
+import java.util.Vector;
 
 public class DFAutomata {
     private final State initialState;
     private State currentState;
 
+    private static Vector<Vector<String>> notInAlphabetErrors;
+
     public DFAutomata(State initialState) {
         this.initialState = initialState;
+        notInAlphabetErrors = new Vector<>();
+    }
+
+    public static void saveError(String v1, String v2, String v3){
+        Vector<String> row = new Vector<>();
+        row.add(v1);
+        row.add(v2);
+        row.add(v3);
+        notInAlphabetErrors.add(row);
+    }
+    public static void addErrorsToData(){
+        if(notInAlphabetErrors.isEmpty()){
+            return;
+        }
+        // Save errors to data
+        for (Vector<String> row : notInAlphabetErrors){
+            Output.addInfoToData(row.get(0), row.get(1), row.get(2));
+        }
+        // Empty errors
+        notInAlphabetErrors = new Vector<>();
     }
 
     public void execute(String str) {
         currentState = initialState;
 
-        StringBuilder errors = new StringBuilder();
-
         for (char c : str.toCharArray()) {
-            // Skip spaces and new line symbols
-            if (c == ' ' || c == '\n'){
-                continue;
-            }
+//            // Skip spaces and new line symbols
+//            if (c == ' ' || c == '\n' || c == '\r'){
+//                continue;
+//            }
 
             // Get next state and output
             TransitionPair tp = currentState.getTransitionParameters(c);
             if(tp != null){
                 // Get output and execute it
-                String res = tp.getOutput().apply(c, false);
-                if (!res.isEmpty())
-                {
-                    // Print result
-                    System.out.println(res);
+                tp.getOutput().apply(c, false);
+                addErrorsToData();
 
-                    // Print errors (after result)
-                    if(!errors.isEmpty())
-                    {
-                        System.out.print(errors);
-                        errors = new StringBuilder();
-                    }
-                }
-                // Change state to the next state
                 currentState = tp.getState();
             } else {
-                errors.append("Error: ").append(c).append(" is not in alphabet!");
+                if(!Output.IS_COMMENT)
+                {
+                    saveError(String.valueOf(c), "ERROR:notInAlphabet", "");
+                }
+
             }
         }
 
@@ -51,43 +65,10 @@ public class DFAutomata {
         // Get next state and output
         TransitionPair tp = currentState.getTransitionParameters(';');
 
-        // Get output and execute it
-        String res = tp.getOutput().apply(';', true);
-        if (!res.isEmpty())
-        {
-            // Print result
-            System.out.println(res);
+        // Get output and execute it (To get the last result)
+        tp.getOutput().apply(';', true);
+        addErrorsToData();
 
-            // Print errors (after result)
-            if(!errors.isEmpty())
-            {
-                System.out.print(errors);
-                errors = new StringBuilder();
-            }
-        }
+        Output.printResultTable();
     }
-
-    public String stringGeneration() {
-        StringBuilder res = new StringBuilder();
-        currentState = initialState;
-        char randSymbol;
-
-        while (!currentState.isFinal()) {
-            randSymbol = currentState.generateChar();
-            res.append(randSymbol);
-            currentState = currentState.getTransitionParameters(randSymbol).getState();
-        }
-
-        Random random = new Random();
-        int randomNumber = random.nextInt(5) + 3; // Generates a random number between 0 and 4, then adds 2 to it
-
-        for (int i = 0; i < randomNumber; i++) {
-            randSymbol = currentState.generateChar();
-            res.append(randSymbol);
-            currentState = currentState.getTransitionParameters(randSymbol).getState();
-        }
-
-        return res.toString();
-    }
-
 }

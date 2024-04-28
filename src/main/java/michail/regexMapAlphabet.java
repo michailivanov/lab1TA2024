@@ -12,7 +12,6 @@ public class regexMapAlphabet {
         regexMap.put("o", "[oO]");
         regexMap.put("r", "[rR]");
         regexMap.put("d", "[dD]");
-
         regexMap.put("N", "[0-9]");
         regexMap.put("(", "\\(");
         regexMap.put(")", "\\)");
@@ -28,6 +27,7 @@ public class regexMapAlphabet {
         regexMap.put("+", "\\+");
         regexMap.put("<", "<");
         regexMap.put(">", ">");
+        regexMap.put("S", "[\s\t\n\r\f]");
     }
     public String get(String s){
         return regexMap.get(s);

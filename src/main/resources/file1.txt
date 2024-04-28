@@ -1,0 +1,11 @@
+for     (i:=0.3e+6;i<.4; a > b) do
+    var1 := 2.;
+    var2 := )do;
+    [This is a one line comment]
+    formula << 5;*
+    [
+        Multi
+        Line
+        Comment
+    ]
+    var1 > var2 for( * for( do* )*
